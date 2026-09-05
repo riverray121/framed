@@ -1,0 +1,41 @@
+# framed configuration. Copy to config.yaml; the bearer token comes from FRAMED_TOKEN.
+
+listen: 0.0.0.0:8090
+data_dir: /data
+
+# Base URL prefixed to relative image urls (for example a Home Assistant
+# media_player entity_picture such as /api/media_player_proxy/...).
+image_base_url: http://127.0.0.1:8123
+
+# Brightness applied at startup and after the device comes back from a power cycle.
+brightness: 80
+
+pixoo:
+  host: 192.168.8.132
+  max_brightness: 90     # hard cap; the firmware is less stable at 100
+  min_interval: 1.0      # seconds between commands
+  frame_interval: 0.2    # seconds between frames of one animation
+  max_frames: 40         # the device crashes on longer animations
+  reset_every: 1         # reset the GIF id before every push
+  watchdog: 60           # seconds between device probes
+
+photos:
+  album: https://www.icloud.com/sharedalbum/#B0xxxxxxxxxxxxx   # public shared album link
+  interval: 240          # seconds each photo stays up
+  refresh: 3600          # seconds between album checks
+  shuffle: true
+  saturation: 1.15
+  contrast: 1.05
+  min_width: 256         # smallest derivative to download
+
+greeting:
+  headline: WELCOME HOME
+  default_color: "#4cc9f0"
+  colors:
+    Elijah: "#ff9f1c"
+
+# Layers present at startup. The lowest priority is what shows when nothing else is up.
+layers:
+  - id: base
+    priority: 0
+    content: {type: photos}
