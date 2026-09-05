@@ -38,12 +38,15 @@ def album_token(url_or_token: str) -> str:
     if "#" in value:
         value = value.rsplit("#", 1)[1]
     value = value.rstrip("/").rsplit("/", 1)[-1]
-    if not value or value[0] not in "AB":
+    if len(value) < 3 or not all(c in _BASE62 or c in "-_" for c in value):
         raise ICloudError(f"not a shared album token: {value!r}")
     return value
 
 
 def partition(token: str) -> int:
+    """The server partition encoded after the token's first character: one base-62
+    digit for ``A`` tokens, two for every other prefix. A wrong guess is harmless
+    because the server answers 330 with the right host."""
     if token[0] == "A":
         return _BASE62.index(token[1])
     return _BASE62.index(token[1]) * 62 + _BASE62.index(token[2])

@@ -10,8 +10,10 @@ def test_token_from_url_and_partition():
     assert partition("B0a5oqs3qXyZ123") == 0 * 62 + 36
     assert base_url("A5xyz").startswith("https://p05-sharedstreams.icloud.com/A5xyz/")
     assert base_url("A5xyz", "p42-sharedstreams.icloud.com").startswith("https://p42-")
+    assert album_token("https://www.icloud.com/sharedalbum/#D2Hv3LCGcq-_x") == "D2Hv3LCGcq-_x"
+    assert partition("D2Hv3LCGcq") == 2 * 62 + 17
     with pytest.raises(ICloudError):
-        album_token("https://example.com/#Z123")
+        album_token("https://example.com/#Z!")
 
 
 def test_pick_smallest_derivative_above_min_width():
