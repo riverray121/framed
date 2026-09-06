@@ -26,7 +26,7 @@ Content types:
 |---|---|---|
 | `photos` | | the photo carousel (see below) |
 | `image` | `url` | a fetched image, square-cropped and resampled |
-| `greeting` | `name`, `color?`, `speed?` | a short looping animation with the name |
+| `greeting` | `names` (or `name`), `color?`, `speed?` | a short looping animation with the names, one line each |
 | `text` | `text` or `lines`, `color?`, `background?` | up to five centered lines |
 | `color` | `color` | a solid fill |
 | `clock` | `id` | one of the device's built-in clock faces (no frame pushes) |

@@ -56,16 +56,20 @@ def _scaled(color: RGB, factor: float) -> RGB:
 
 
 def greeting_frames(
-    name: str,
-    color: RGB,
+    names: list[tuple[str, RGB]],
     *,
     frames: int = 16,
     headline: str = "WELCOME HOME",
 ) -> list[Image.Image]:
-    """A short looping animation: the headline, the name fading in, drifting sparkles."""
-    rng = random.Random(name)
+    """A short looping animation: the headline, one line per (name, color) fading in,
+    drifting sparkles in the first name's color. Up to three names fit."""
+    names = names[:3] or [("FRIEND", WHITE)]
+    accent = names[0][1]
+    rng = random.Random("".join(n for n, _ in names))
     sparkles = [(rng.randrange(SIZE), rng.randrange(SIZE), rng.random()) for _ in range(28)]
     words = headline.split()
+    single = len(names) == 1
+    line_h = GLYPH_H + 3
     out = []
     for i in range(frames):
         t = i / max(1, frames - 1)
@@ -75,15 +79,22 @@ def greeting_frames(
             level = (phase + t) % 1.0
             bright = int(255 * (1 - abs(level * 2 - 1)))
             y = (sy - i) % SIZE
-            px[sx, y] = _scaled(color, bright / 255 * 0.55)
-        y = 10
+            px[sx, y] = _scaled(accent, bright / 255 * 0.55)
+        y = 6 if single else 4
         for word in words:
             draw_centered(frame, word, y, WHITE)
             y += GLYPH_H + 2
         fade = min(1.0, i / max(1, frames // 3))
-        draw_centered(frame, name, 38, _scaled(color, fade), scale=2 if len(name) <= 5 else 1)
+        if single:
+            name, color = names[0]
+            scale = 2 if len(name) <= 5 else 1
+            draw_centered(frame, name, 36 if scale == 2 else 38, _scaled(color, fade), scale=scale)
+        else:
+            top = 56 - len(names) * line_h
+            for n, (name, color) in enumerate(names):
+                draw_centered(frame, name, top + n * line_h, _scaled(color, fade))
         bar_w = int(SIZE * t)
         for x in range((SIZE - bar_w) // 2, (SIZE + bar_w) // 2):
-            px[x, 58] = color
+            px[x, 60] = accent
         out.append(frame)
     return out

@@ -124,14 +124,9 @@ class Compositor:
                 image = await self._fetch_image(content["url"])
                 await self.pixoo.push([fit_image(image)])
             elif kind == "greeting":
-                name = str(content.get("name", "")).strip() or "FRIEND"
-                color = parse_color(
-                    content.get("color")
-                    or self.cfg.greeting.colors.get(name)
-                    or self.cfg.greeting.colors.get(name.lower())
-                    or self.cfg.greeting.default_color
+                frames = greeting_frames(
+                    self._greeting_names(content), headline=self.cfg.greeting.headline
                 )
-                frames = greeting_frames(name.upper(), color, headline=self.cfg.greeting.headline)
                 await self.pixoo.push(frames, speed_ms=int(content.get("speed", 120)))
             elif kind == "text":
                 lines = content.get("lines") or str(content.get("text", "")).split("\n")
@@ -156,6 +151,26 @@ class Compositor:
             log.warning("layer %s cannot be rendered: %r", layer.id, exc)
             return False
         return True
+
+    def _greeting_names(self, content: dict) -> list[tuple[str, tuple[int, int, int]]]:
+        """(NAME, color) pairs from ``names`` or ``name``; colors come from the request,
+        then the config's per-person map, then the default."""
+        raw = content.get("names") or [content.get("name", "")]
+        if isinstance(raw, str):
+            raw = [raw]
+        pairs = []
+        for entry in raw:
+            name = str(entry).strip()
+            if not name:
+                continue
+            color = parse_color(
+                content.get("color")
+                or self.cfg.greeting.colors.get(name)
+                or self.cfg.greeting.colors.get(name.lower())
+                or self.cfg.greeting.default_color
+            )
+            pairs.append((name.upper(), color))
+        return pairs
 
     async def _show_photo(self) -> None:
         frame = self.photos.next()

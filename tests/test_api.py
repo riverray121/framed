@@ -58,6 +58,19 @@ async def test_layer_lifecycle_and_render(client):
     assert client.device_calls[-1][1]["PicNum"] == 1
 
 
+async def test_greeting_with_several_names(client):
+    h = {"Authorization": "Bearer secret"}
+    body = {
+        "id": "greet-elijah-ram",
+        "priority": 80,
+        "content": {"type": "greeting", "names": ["Elijah", "Ram"]},
+    }
+    await client.post("/layers", json=body, headers=h)
+    await client.compositor._tick()
+    assert client.compositor.showing[0] == "greet-elijah-ram"
+    assert client.compositor._greeting_names(body["content"])[1][0] == "RAM"
+
+
 async def test_bad_content_type_is_400(client):
     h = {"Authorization": "Bearer secret"}
     resp = await client.post("/layers", json={"id": "x", "content": {"type": "nope"}}, headers=h)

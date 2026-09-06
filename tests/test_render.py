@@ -21,7 +21,10 @@ def test_fit_image_crops_to_square_panel():
 def test_text_frame_and_greeting_shape():
     frame = text_frame(["NO", "PHOTOS"])
     assert frame.size == (64, 64)
-    frames = greeting_frames("ELIJAH", (255, 159, 28))
+    frames = greeting_frames([("ELIJAH", (255, 159, 28))])
     assert len(frames) == 16
     assert all(f.size == (64, 64) for f in frames)
     assert frames[0].tobytes() != frames[-1].tobytes()
+    pair = greeting_frames([("ELIJAH", (255, 159, 28)), ("RAM", (76, 201, 240))])
+    assert pair[-1].tobytes() != frames[-1].tobytes()
+    assert len(greeting_frames([])) == 16
