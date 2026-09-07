@@ -51,6 +51,16 @@ class LayerStack:
             last = self._last_shown.get(layer.id)
             if last is not None and time.time() - last < cooldown:
                 return False
+        existing = self._layers.get(layer.id)
+        if (
+            existing is not None
+            and existing.content == layer.content
+            and existing.priority == layer.priority
+        ):
+            # Same content again only restarts the lifetime; no redraw.
+            existing.ttl = layer.ttl
+            existing.created = layer.created
+            return True
         self._version += 1
         layer.version = self._version
         self._layers[layer.id] = layer

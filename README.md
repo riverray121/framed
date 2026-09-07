@@ -18,7 +18,9 @@ POST /layers {id, priority, ttl, content}
 The stack is the whole model. There is no "mode" to switch; a client adds a layer and
 optionally gives it a `ttl`. When the layer expires or is deleted, whatever is beneath it
 comes back on its own. A `cooldown` on a layer id stops the same event from replaying
-(GPS jitter re-triggering a welcome, for example).
+(GPS jitter re-triggering a welcome, for example). Posting a layer again with the same
+content restarts its lifetime without redrawing, so a second signal can shorten or extend
+what is already on screen.
 
 Content types:
 

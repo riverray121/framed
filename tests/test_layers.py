@@ -41,3 +41,14 @@ def test_empty_stack():
     assert stack.top() is None
     assert stack.all() == []
     assert not stack.remove("nothing")
+
+
+def test_same_content_restarts_ttl_without_redraw():
+    stack = LayerStack()
+    stack.upsert(Layer("greet", 80, {"type": "greeting", "names": ["Elijah"]}, ttl=900))
+    version = stack.top().version
+    stack.upsert(Layer("greet", 80, {"type": "greeting", "names": ["Elijah"]}, ttl=180))
+    top = stack.top()
+    assert top.version == version and top.ttl == 180
+    stack.upsert(Layer("greet", 80, {"type": "greeting", "names": ["Elijah", "Ram"]}, ttl=180))
+    assert stack.top().version > version
