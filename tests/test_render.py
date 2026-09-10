@@ -1,6 +1,7 @@
 import pytest
 from PIL import Image
 
+from framed.font import glyph
 from framed.render import fit_image, greeting_frames, parse_color, text_frame
 
 
@@ -27,4 +28,5 @@ def test_text_frame_and_greeting_shape():
     assert frames[0].tobytes() != frames[-1].tobytes()
     pair = greeting_frames([("ELIJAH", (255, 159, 28)), ("RAM", (76, 201, 240))])
     assert pair[-1].tobytes() != frames[-1].tobytes()
+    assert glyph("&") != glyph(" ")
     assert len(greeting_frames([])) == 16

@@ -62,9 +62,10 @@ def greeting_frames(
     headline: str = "WELCOME HOME",
 ) -> list[Image.Image]:
     """A short looping animation: the headline, one line per (name, color) fading in,
-    drifting sparkles in the first name's color. Up to three names fit."""
+    the last of several names prefixed with "&", drifting sparkles and a progress bar
+    that share out the names' colors. Up to three names fit."""
     names = names[:3] or [("FRIEND", WHITE)]
-    accent = names[0][1]
+    accents = [color for _, color in names]
     rng = random.Random("".join(n for n, _ in names))
     sparkles = [(rng.randrange(SIZE), rng.randrange(SIZE), rng.random()) for _ in range(28)]
     words = headline.split()
@@ -75,11 +76,11 @@ def greeting_frames(
         t = i / max(1, frames - 1)
         frame = blank()
         px = frame.load()
-        for sx, sy, phase in sparkles:
+        for k, (sx, sy, phase) in enumerate(sparkles):
             level = (phase + t) % 1.0
             bright = int(255 * (1 - abs(level * 2 - 1)))
             y = (sy - i) % SIZE
-            px[sx, y] = _scaled(accent, bright / 255 * 0.55)
+            px[sx, y] = _scaled(accents[k % len(accents)], bright / 255 * 0.55)
         y = 6 if single else 4
         for word in words:
             draw_centered(frame, word, y, WHITE)
@@ -92,9 +93,11 @@ def greeting_frames(
         else:
             top = 56 - len(names) * line_h
             for n, (name, color) in enumerate(names):
-                draw_centered(frame, name, top + n * line_h, _scaled(color, fade))
+                label = f"& {name}" if n == len(names) - 1 else name
+                draw_centered(frame, label, top + n * line_h, _scaled(color, fade))
         bar_w = int(SIZE * t)
-        for x in range((SIZE - bar_w) // 2, (SIZE + bar_w) // 2):
-            px[x, 60] = accent
+        left = (SIZE - bar_w) // 2
+        for x in range(left, left + bar_w):
+            px[x, 60] = accents[min(len(accents) - 1, x * len(accents) // SIZE)]
         out.append(frame)
     return out
